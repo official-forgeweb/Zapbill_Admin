@@ -1,0 +1,242 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model admins {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  password_hash String
+  name          String
+  role          String   // super_admin, admin, support
+  created_at    DateTime @default(now())
+}
+
+model clients {
+  id             String          @id @default(uuid())
+  business_name  String
+  owner_name     String
+  email          String          @unique
+  phone          String?
+  address        String?
+  city           String?
+  state          String?
+  gst_number     String?
+  plan_type      String          // one_time_basic, one_time_standard, one_time_premium
+  amc_status     String          // active, expired, not_applicable
+  amc_start_date DateTime?
+  amc_end_date   DateTime?
+  max_devices    Int             @default(1)
+  status         String          @default("active") // active, suspended, cancelled
+  notes          String?
+  created_at     DateTime        @default(now())
+  updated_at     DateTime        @updatedAt
+
+  licenses       licenses[]
+  devices        devices[]
+  client_features client_features[]
+  amc_payments   amc_payments[]
+
+  website_order_configs   website_order_configs?
+  website_pending_orders  website_pending_orders[]
+  website_order_daily_stats website_order_daily_stats[]
+  website_menu_cache      website_menu_cache?
+  website_coupon_cache    website_coupon_cache?
+}
+
+model licenses {
+  id             String    @id @default(uuid())
+  client_id      String
+  client         clients   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  license_key    String    @unique
+  license_secret String    // hashed
+  device_id      String?   // hardware fingerprint (can be null if not activated yet)
+  device_name    String?
+  is_primary     Boolean   @default(false)
+  is_active      Boolean   @default(true)
+  activated_at   DateTime?
+  expires_at     DateTime? // one-time expiry or AMC expiry
+  created_at     DateTime  @default(now())
+
+  devices        devices[]
+}
+
+model devices {
+  id            String    @id @default(uuid())
+  client_id     String
+  client        clients   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  license_id    String?
+  license       licenses? @relation(fields: [license_id], references: [id])
+  hardware_id   String    @unique // unique fingerprint
+  device_name   String?
+  os_info       String?
+  is_primary    Boolean   @default(false)
+  is_active     Boolean   @default(true)
+  is_paid       Boolean   @default(false) // extra devices need separate payment
+  registered_at DateTime  @default(now())
+  last_seen     DateTime?
+}
+
+model features {
+  id              String   @id @default(uuid())
+  feature_key     String   @unique // billing, qr_order, kitchen_display, etc.
+  feature_name    String
+  description     String?
+  version         String   @default("1.0.0")
+  is_free         Boolean  @default(false)
+  monthly_price   Float    @default(0)
+  yearly_price    Float    @default(0)
+  plugin_filename String?
+  plugin_hash     String?
+  plugin_size     Int?
+  depends_on      String[] // array of feature_keys this depends on
+  is_active       Boolean  @default(true)
+  created_at      DateTime @default(now())
+
+  client_features client_features[]
+}
+
+model client_features {
+  id               String   @id @default(uuid())
+  client_id        String
+  client           clients  @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  feature_id       String
+  feature          features @relation(fields: [feature_id], references: [id], onDelete: Cascade)
+  is_enabled       Boolean  @default(true)
+  is_trial         Boolean  @default(false)
+  trial_start_date DateTime?
+  trial_end_date   DateTime?
+  granted_at       DateTime @default(now())
+  granted_by       String?  // admin FK
+  revoked_at       DateTime?
+  revoked_by       String?  // admin FK
+
+  @@unique([client_id, feature_id])
+}
+
+model plans {
+  id                 String   @id @default(uuid())
+  plan_key           String   @unique
+  plan_name          String
+  description        String?
+  one_time_price     Float    @default(0)
+  amc_price_per_year Float    @default(0)
+  max_devices        Int      @default(1)
+  features           String[] // array of feature_keys
+  is_active          Boolean  @default(true)
+  created_at         DateTime @default(now())
+}
+
+model amc_payments {
+  id             String   @id @default(uuid())
+  client_id      String
+  client         clients  @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  amount         Float
+  payment_date   DateTime @default(now())
+  payment_proof  String?
+  period_start   DateTime
+  period_end     DateTime
+  payment_mode   String   // UPI, bank_transfer, cash
+  transaction_id String?
+  notes          String?
+  received_by    String?  // admin FK
+  created_at     DateTime @default(now())
+}
+
+model audit_logs {
+  id          String   @id @default(uuid())
+  admin_id    String
+  action      String
+  entity_type String
+  entity_id   String
+  old_data    String?  // JSON stringified
+  new_data    String?  // JSON stringified
+  ip_address  String?
+  created_at  DateTime @default(now())
+}
+
+model website_order_configs {
+  id                        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  client_id                 String    @unique
+  client                    clients   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  api_key                   String    @unique @db.VarChar(255)
+  api_secret_hash           String    @db.VarChar(255)
+  restaurant_id             String    @unique @db.VarChar(100)
+  is_enabled                Boolean   @default(true)
+  polling_interval_seconds  Int       @default(10)
+  order_timeout_minutes     Int       @default(30)
+  max_orders_per_day        Int       @default(500)
+  order_prefix              String    @default("WEB-") @db.VarChar(20)
+  last_poll_at              DateTime?
+  last_order_at             DateTime?
+  last_menu_sync_at         DateTime?
+  last_coupon_sync_at       DateTime?
+  menu_item_count           Int       @default(0)
+  active_coupon_count       Int       @default(0)
+  activated_at              DateTime  @default(now())
+  created_at                DateTime  @default(now())
+  updated_at                DateTime  @default(now()) @updatedAt
+}
+
+model website_pending_orders {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  client_id       String
+  client          clients   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  order_id        String    @db.VarChar(50)
+  order_data      Json
+  status          String    @default("pending") @db.VarChar(20)
+  received_at     DateTime  @default(now())
+  acknowledged_at DateTime?
+  rejected_at     DateTime?
+  reject_reason   String?
+  expires_at      DateTime?
+  created_at      DateTime  @default(now())
+
+  @@unique([client_id, order_id])
+  @@index([client_id, status])
+}
+
+model website_order_daily_stats {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  client_id       String
+  client          clients   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  date            DateTime  @db.Date
+  orders_received Int       @default(0)
+  orders_accepted Int       @default(0)
+  orders_rejected Int       @default(0)
+  orders_expired  Int       @default(0)
+  total_amount    Decimal   @default(0) @db.Decimal(12, 2)
+  created_at      DateTime  @default(now())
+
+  @@unique([client_id, date])
+}
+
+model website_menu_cache {
+  id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  client_id          String    @unique
+  client             clients   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  menu_data          Json
+  item_count         Int       @default(0)
+  synced_at          DateTime  @default(now())
+  synced_from_device String?   @db.VarChar(255)
+  created_at         DateTime  @default(now())
+  updated_at         DateTime  @default(now()) @updatedAt
+}
+
+model website_coupon_cache {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  client_id       String    @unique
+  client          clients   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  coupons_data    Json
+  coupon_count    Int       @default(0)
+  synced_at       DateTime  @default(now())
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @default(now()) @updatedAt
+}
