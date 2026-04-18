@@ -653,4 +653,61 @@ router.get('/export/csv', authenticate, async (req, res) => {
   }
 });
 
+// POST /api/clients/:id/licenses - Generate additional license for existing client
+router.post('/:id/licenses', authenticate, requireRole('super_admin', 'admin'), async (req, res) => {
+  try {
+    const client = await prisma.clients.findUnique({
+      where: { id: req.params.id },
+      include: {
+        _count: {
+          select: { licenses: true }
+        }
+      }
+    });
+
+    if (!client) {
+      return res.status(404).json({ error: 'Client not found' });
+    }
+
+    if (client.status !== 'active') {
+      return res.status(400).json({ error: 'Client is not active' });
+    }
+
+    // Generate license credentials
+    const licenseKey = generateLicenseKey();
+    const licenseSecretPlain = generateLicenseSecret();
+    const licenseSecretHash = await bcrypt.hash(licenseSecretPlain, 12);
+
+    const newLicense = await prisma.licenses.create({
+      data: {
+        client_id: client.id,
+        license_key: licenseKey,
+        license_secret: licenseSecretHash,
+        is_primary: client._count.licenses === 0,
+      },
+    });
+
+    await logAudit({
+      adminId: req.admin.id,
+      action: 'ADD_LICENSE',
+      entityType: 'client',
+      entityId: client.id,
+      newData: { license_key: licenseKey },
+      ipAddress: req.ip,
+    });
+
+    res.status(201).json({
+      license: newLicense,
+      credentials: {
+        license_key: licenseKey,
+        license_secret: licenseSecretPlain,
+        message: 'IMPORTANT: Save these credentials now. The secret will NOT be shown again.',
+      },
+    });
+  } catch (error) {
+    console.error('Generate additional license error:', error);
+    res.status(500).json({ error: 'Failed to generate additional license' });
+  }
+});
+
 module.exports = router;

@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   ArrowLeft, Edit3, Save, X, ShieldCheck, KeyRound, Monitor,
   Puzzle, CreditCard, Copy, Check, AlertTriangle, Ban, Trash2,
-  RefreshCw, Power, ToggleLeft, ToggleRight, Clock, Plus, ArrowUpCircle
+  RefreshCw, Power, ToggleLeft, ToggleRight, Clock, Plus, ArrowUpCircle, Link2Off
 } from 'lucide-react';
 import api from '../lib/api';
 import toast from 'react-hot-toast';
@@ -20,6 +20,7 @@ export default function ClientDetailPage() {
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState({});
   const [activeTab, setActiveTab] = useState('overview');
+  const [newCredentials, setNewCredentials] = useState(null);
   const [copied, setCopied] = useState(false);
   const [showAmcForm, setShowAmcForm] = useState(false);
   const [showUpgradePlan, setShowUpgradePlan] = useState(false);
@@ -102,9 +103,42 @@ export default function ClientDetailPage() {
       const res = await api.post(`/licenses/${licenseId}/regenerate`);
       toast.success('Credentials regenerated!');
       const creds = res.data.credentials;
-      alert(`NEW CREDENTIALS (Save Now!):\n\nLicense Key: ${creds.license_key}\nSecret: ${creds.license_secret}`);
+      setNewCredentials(creds);
       loadClient();
     } catch { toast.error('Failed to regenerate'); }
+  };
+
+  const handleAddLicense = async () => {
+    if (!confirm('Generate a new license for this client (for an additional device)?')) return;
+    if (client.licenses?.length >= client.max_devices) {
+      if (!confirm(`Warning: This client only has a limit of ${client.max_devices} devices but currently has ${client.licenses.length} licenses. Generating another license exceeds their plan limit. Continue anyway?`)) return;
+    }
+    try {
+      const res = await api.post(`/clients/${id}/licenses`);
+      toast.success('License generated successfully!');
+      const creds = res.data.credentials;
+      setNewCredentials(creds);
+      loadClient();
+    } catch (err) { toast.error(err.response?.data?.error || 'Failed to add license'); }
+  };
+
+  const handleUnbindDevice = async (licenseId) => {
+    if (!confirm('Unbind the device from this license? Current device will be logged out, letting them use these same credentials on a new computer.')) return;
+    try {
+      await api.post(`/licenses/${licenseId}/unbind`);
+      toast.success('Device unbound successfully!');
+      loadClient();
+    } catch { toast.error('Failed to unbind device'); }
+  };
+
+  const handleToggleDevice = async (deviceId, currentStatus) => {
+    const action = currentStatus ? 'deactivate' : 'activate';
+    if (!confirm(`Are you sure you want to ${action} this device?`)) return;
+    try {
+      await api.post(`/devices/${deviceId}/${action}`);
+      toast.success(`Device ${action}d successfully`);
+      loadClient();
+    } catch { toast.error(`Failed to ${action} device`); }
   };
 
   const handleAmcPayment = async (e) => {
@@ -571,9 +605,15 @@ export default function ClientDetailPage() {
 
       {activeTab === 'licenses' && (
         <div className="glass-card p-6">
-          <h3 className="text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2">
-            <KeyRound size={16} className="text-primary-400" /> License Keys
-          </h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
+              <KeyRound size={16} className="text-primary-400" /> License Keys ({client.licenses?.length || 0}/{client.max_devices})
+            </h3>
+            <button onClick={handleAddLicense}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-primary-500/10 text-primary-600 rounded-md text-xs font-semibold hover:bg-primary-500/20 transition-colors">
+              <Plus size={14} /> Add License
+            </button>
+          </div>
           <div className="space-y-3">
             {client.licenses?.map(lic => (
               <div key={lic.id} className="p-4 bg-slate-50/30 rounded-xl border border-slate-300/30">
@@ -589,10 +629,18 @@ export default function ClientDetailPage() {
                       </span>
                     )}
                   </div>
-                  <button onClick={() => handleRegenerateLicense(lic.id)}
-                    className="flex items-center gap-1 px-2 py-1 text-xs text-warn-400 bg-warn-500/10 rounded-md hover:bg-warn-500/20 transition-colors">
-                    <RefreshCw size={12} /> Regenerate
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {lic.device_id && (
+                      <button onClick={() => handleUnbindDevice(lic.id)}
+                        className="flex items-center gap-1 px-2 py-1 text-xs text-danger-500 bg-danger-500/10 rounded-md hover:bg-danger-500/20 transition-colors" title="Disconnect device from this license">
+                        <Link2Off size={12} /> Unbind
+                      </button>
+                    )}
+                    <button onClick={() => handleRegenerateLicense(lic.id)}
+                      className="flex items-center gap-1 px-2 py-1 text-xs text-warn-500 bg-warn-500/10 rounded-md hover:bg-warn-500/20 transition-colors" title="Generate a new key/secret and disconnect any device">
+                      <RefreshCw size={12} /> Regenerate
+                    </button>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <code className="flex-1 text-sm text-primary-400 font-mono bg-white/50 px-3 py-2 rounded-lg">{lic.license_key}</code>
@@ -601,7 +649,7 @@ export default function ClientDetailPage() {
                   </button>
                 </div>
                 {lic.device_id && (
-                  <p className="text-xs text-slate-400 mt-2">Bound to: {lic.device_name || lic.device_id}</p>
+                  <p className="text-xs text-slate-400 mt-2">Bound to Device: {lic.device_name || lic.device_id}</p>
                 )}
                 {lic.activated_at && (
                   <p className="text-xs text-slate-400">Activated: {new Date(lic.activated_at).toLocaleString()}</p>
@@ -629,10 +677,16 @@ export default function ClientDetailPage() {
                       {d.os_info && <p className="text-xs text-slate-400">{d.os_info}</p>}
                     </div>
                   </div>
-                  <div className="text-right">
-                    <span className={`badge ${d.is_active ? 'badge-active' : 'badge-expired'}`}>
-                      {d.is_active ? 'Online' : 'Offline'}
-                    </span>
+                  <div className="flex flex-col items-end gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className={`badge ${d.is_active ? 'badge-active' : 'badge-expired'}`}>
+                        {d.is_active ? 'Active' : 'Inactive'}
+                      </span>
+                      <button onClick={() => handleToggleDevice(d.id, d.is_active)}
+                        className={`px-2 py-1 text-xs rounded-md font-medium transition-colors ${d.is_active ? 'bg-danger-500/10 text-danger-600 hover:bg-danger-500/20' : 'bg-accent-500/10 text-accent-600 hover:bg-accent-500/20'}`}>
+                        {d.is_active ? 'Deactivate' : 'Activate'}
+                      </button>
+                    </div>
                     {d.last_seen && (
                       <p className="text-xs text-slate-400 mt-1">Last: {new Date(d.last_seen).toLocaleString()}</p>
                     )}
@@ -670,6 +724,58 @@ export default function ClientDetailPage() {
           ) : (
             <p className="text-slate-400 text-sm text-center py-8">No activity recorded</p>
           )}
+        </div>
+      )}
+
+      {/* New Credentials Modal */}
+      {newCredentials && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+            <div className="bg-primary-500/10 p-6 flex flex-col items-center justify-center border-b border-primary-500/10">
+              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
+                <KeyRound size={32} className="text-primary-500" />
+              </div>
+              <h2 className="text-xl font-bold text-slate-900">Credentials Generated!</h2>
+              <p className="text-sm text-slate-500 text-center mt-2 max-w-xs">
+                {newCredentials.message || 'IMPORTANT: Save these credentials now. The secret will NOT be shown again.'}
+              </p>
+            </div>
+            
+            <div className="p-6 space-y-4 bg-slate-50">
+              <div>
+                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">License Key</label>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-3 font-mono text-sm text-slate-800 break-all shadow-sm">
+                    {newCredentials.license_key}
+                  </div>
+                  <button onClick={() => copyText(newCredentials.license_key)} 
+                    className="p-3 bg-white border border-slate-200 hover:border-primary-400 hover:text-primary-600 text-slate-500 rounded-xl shadow-sm transition-all">
+                    {copied ? <Check size={18} className="text-accent-500" /> : <Copy size={18} />}
+                  </button>
+                </div>
+              </div>
+              
+              <div>
+                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">License Secret</label>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-3 font-mono text-sm text-slate-800 break-all shadow-sm">
+                    {newCredentials.license_secret}
+                  </div>
+                  <button onClick={() => copyText(newCredentials.license_secret)} 
+                    className="p-3 bg-white border border-slate-200 hover:border-primary-400 hover:text-primary-600 text-slate-500 rounded-xl shadow-sm transition-all">
+                    {copied ? <Check size={18} className="text-accent-500" /> : <Copy size={18} />}
+                  </button>
+                </div>
+              </div>
+              
+              <div className="pt-4 border-t border-slate-200">
+                <button onClick={() => setNewCredentials(null)} 
+                  className="w-full py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold shadow-md transition-all active:scale-[0.98]">
+                  I Have Saved These Credentials
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
