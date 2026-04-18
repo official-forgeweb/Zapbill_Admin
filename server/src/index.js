@@ -10,6 +10,13 @@ const prisma = require('./lib/prisma');
 
 const app = express();
 
+console.log('--- Server Starting ---');
+console.log('Node Env:', process.env.NODE_ENV);
+console.log('Vercel Env:', process.env.VERCEL);
+console.log('DB URL Present:', !!process.env.DATABASE_URL);
+console.log('JWT Secret Present:', !!process.env.JWT_SECRET);
+console.log('-----------------------');
+
 // Trust proxy for rate limiting behind Railway/Render
 app.set('trust proxy', 1);
 

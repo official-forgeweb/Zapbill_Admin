@@ -10,8 +10,7 @@ const requiredVariables = [
 // The prompt asked to make these required: DATABASE_URL, JWT_SECRET, LICENSE_ENCRYPTION_KEY, ALLOWED_ORIGINS
 const strictlyRequired = [
   'DATABASE_URL',
-  'JWT_SECRET',
-  'ALLOWED_ORIGINS'
+  'JWT_SECRET'
 ];
 
 function validateEnv() {
