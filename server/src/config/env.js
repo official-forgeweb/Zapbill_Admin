@@ -35,9 +35,9 @@ function validateEnv() {
     jwtSecret: process.env.JWT_SECRET,
     jwtExpiresIn: process.env.JWT_EXPIRES_IN || '24h',
     licenseEncryptionKey: process.env.LICENSE_ENCRYPTION_KEY || 'default-fallback-key-do-not-use-in-prod',
-    allowedOrigins: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim()) : ['http://localhost:3000', 'http://localhost:5173', 'https://admin.zapbill.com'],
-    adminPanelUrl: process.env.ADMIN_PANEL_URL || 'https://admin.zapbill.com',
-    apiBaseUrl: process.env.API_BASE_URL || 'https://api.zapbill.com'
+    allowedOrigins: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim()) : ['http://localhost:3000', 'http://localhost:5173', 'https://admin.flashbill.com'],
+    adminPanelUrl: process.env.ADMIN_PANEL_URL || 'https://admin.flashbill.com',
+    apiBaseUrl: process.env.API_BASE_URL || 'https://api.flashbill.com'
   };
 }
 

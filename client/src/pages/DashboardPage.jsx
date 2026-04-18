@@ -67,7 +67,7 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold text-slate-900">Dashboard</h2>
-          <p className="text-slate-500 text-sm mt-0.5">Overview of your ZapBill business</p>
+          <p className="text-slate-500 text-sm mt-0.5">Overview of your FlashBill business</p>
         </div>
         <Link
           to="/clients/new"

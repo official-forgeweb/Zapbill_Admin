@@ -102,13 +102,13 @@ export default function WebsiteOrdersOverviewPage() {
              {data.filter(d => d.status === 'offline' && d.pending_count > 0).map(d => (
                 <div key={d.id} className="text-xs bg-white text-warn-700 py-2 px-3 rounded border border-warn-100 flex gap-2 items-center shadow-sm">
                    <AlertTriangle size={14} className="text-warn-500"/>
-                   <strong>{d.business_name}:</strong> {d.pending_count} pending order(s), ZapBill is OFFLINE (last poll: {getTimeAgo(d.last_poll_at)}). Contact client immediately.
+                   <strong>{d.business_name}:</strong> {d.pending_count} pending order(s), FlashBill is OFFLINE (last poll: {getTimeAgo(d.last_poll_at)}). Contact client immediately.
                 </div>
              ))}
              {data.filter(d => d.status === 'never_polled' && d.is_enabled).map(d => (
                 <div key={d.id} className="text-xs bg-white text-slate-600 py-2 px-3 rounded border border-slate-200 flex gap-2 items-center shadow-sm">
                    <Monitor size={14} className="text-slate-400"/>
-                   <strong>{d.business_name}:</strong> Feature is enabled but ZapBill has NEVER polled. Client might be on an older software version or hasn't restarted yet.
+                   <strong>{d.business_name}:</strong> Feature is enabled but FlashBill has NEVER polled. Client might be on an older software version or hasn't restarted yet.
                 </div>
              ))}
           </div>

@@ -2,7 +2,7 @@ const { Client } = require('pg');
 
 // SOURCE: Local DB
 const sourceConfig = {
-    connectionString: "postgresql://postgres:ndacadet002@localhost:5432/zapbill_admin?schema=public"
+    connectionString: "postgresql://postgres:ndacadet002@localhost:5432/flashbill_admin?schema=public"
 };
 
 // TARGET: Supabase DB (using direct URL for speed and reliability during migration)

@@ -160,12 +160,12 @@ export default function WebsiteOrdersTab({ clientId, clientName }) {
           <span className="badge badge-neutral">Status: ❌ Not Enabled</span>
         </div>
         <p className="text-sm text-slate-600 mb-4 max-w-2xl">
-          This feature allows the client to connect their own website to ZapBill for receiving online orders.
-          Orders will appear directly in the ZapBill POS application.
+          This feature allows the client to connect their own website to FlashBill for receiving online orders.
+          Orders will appear directly in the FlashBill POS application.
         </p>
         <ul className="text-sm text-slate-600 list-disc list-inside mb-4 space-y-1">
           <li>Client's website sends orders to our API</li>
-          <li>Orders appear in ZapBill's Website Orders tab</li>
+          <li>Orders appear in FlashBill's Website Orders tab</li>
           <li>Menu and coupons sync automatically</li>
           <li>We provide the API infrastructure, the client provides their website</li>
         </ul>
@@ -213,17 +213,17 @@ export default function WebsiteOrdersTab({ clientId, clientName }) {
   const pollDiffSecs = lastPollAt ? Math.floor((now - lastPollAt) / 1000) : null;
   
   let connectionStatus = 'never';
-  let connectionText = '🟡 Never Connected (ZapBill hasn\'t polled yet)';
+  let connectionText = '🟡 Never Connected (FlashBill hasn\'t polled yet)';
   let connectionColor = 'text-warn-500';
 
   if (pollDiffSecs !== null) {
     if (pollDiffSecs < 60) {
       connectionStatus = 'online';
-      connectionText = `🟢 ZapBill Connected (last poll: ${pollDiffSecs} seconds ago)`;
+      connectionText = `🟢 FlashBill Connected (last poll: ${pollDiffSecs} seconds ago)`;
       connectionColor = 'text-accent-500';
     } else {
       connectionStatus = 'offline';
-      connectionText = `🔴 ZapBill Disconnected (last poll: ${Math.floor(pollDiffSecs/60)} minutes ago)`;
+      connectionText = `🔴 FlashBill Disconnected (last poll: ${Math.floor(pollDiffSecs/60)} minutes ago)`;
       connectionColor = 'text-danger-500';
     }
   }
@@ -415,7 +415,7 @@ export default function WebsiteOrdersTab({ clientId, clientName }) {
               <div className="p-6 overflow-y-auto space-y-6 flex-1">
                  <div>
                     <h3 className="font-bold text-slate-800 mb-2 border-b pb-1">Base URL</h3>
-                    <code className="p-2 block bg-slate-800 text-green-400 rounded-md text-sm">https://api.zapbill.com/v1/wo</code>
+                    <code className="p-2 block bg-slate-800 text-green-400 rounded-md text-sm">https://api.flashbill.com/v1/wo</code>
                  </div>
                  <div>
                     <h3 className="font-bold text-slate-800 mb-2 border-b pb-1">Authentication Header</h3>
@@ -429,7 +429,7 @@ X-Restaurant-ID: {credentials.restaurant_id}
                     
                     <div className="mt-4 bg-white border rounded-lg overflow-hidden">
                        <div className="bg-slate-50 p-2 font-mono text-sm border-b font-bold text-primary-700">GET /menu</div>
-                       <div className="p-4 text-sm text-slate-700">Fetch restaurant's current menu synced from ZapBill POS.</div>
+                       <div className="p-4 text-sm text-slate-700">Fetch restaurant's current menu synced from FlashBill POS.</div>
                     </div>
                     
                     <div className="mt-4 bg-white border rounded-lg overflow-hidden">

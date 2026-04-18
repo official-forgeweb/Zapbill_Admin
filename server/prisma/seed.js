@@ -15,10 +15,10 @@ async function main() {
   // Create super admin
   const adminPassword = await bcrypt.hash('admin123', 12);
   const admin = await prisma.admins.upsert({
-    where: { email: 'admin@zapbill.com' },
+    where: { email: 'admin@flashbill.com' },
     update: {},
     create: {
-      email: 'admin@zapbill.com',
+      email: 'admin@flashbill.com',
       password_hash: adminPassword,
       name: 'Super Admin',
       role: 'super_admin',
@@ -40,6 +40,7 @@ async function main() {
     { feature_key: 'staff_management', feature_name: 'Staff Management', description: 'Employee roles, shifts, and attendance', is_free: false, monthly_price: 249, yearly_price: 2499 },
     { feature_key: 'analytics', feature_name: 'Advanced Analytics', description: 'Business intelligence and insights dashboard', is_free: false, monthly_price: 499, yearly_price: 4999 },
     { feature_key: 'whatsapp_integration', feature_name: 'WhatsApp Integration', description: 'Send bills and updates via WhatsApp', is_free: false, monthly_price: 299, yearly_price: 2999 },
+    { feature_key: 'expenses', feature_name: 'Expense Management', description: 'Track daily expenses and cash outs', is_free: false, monthly_price: 199, yearly_price: 1999 },
   ];
 
   for (const f of featuresData) {
@@ -78,7 +79,7 @@ async function main() {
       one_time_price: 19999,
       amc_price_per_year: 7999,
       max_devices: 5,
-      features: ['billing', 'menu_management', 'inventory', 'qr_order', 'kitchen_display', 'cloud_sync', 'email_reports', 'customer_management', 'staff_management', 'analytics', 'whatsapp_integration', 'website_orders'],
+      features: ['billing', 'menu_management', 'inventory', 'qr_order', 'kitchen_display', 'cloud_sync', 'email_reports', 'customer_management', 'staff_management', 'analytics', 'whatsapp_integration', 'website_orders', 'expenses'],
     },
   ];
 
@@ -92,7 +93,7 @@ async function main() {
   console.log('✅ Plans seeded:', plansData.length);
 
   console.log('\n🎉 Seeding complete!');
-  console.log('📧 Admin Login: admin@zapbill.com');
+  console.log('📧 Admin Login: admin@flashbill.com');
   console.log('🔑 Admin Password: admin123');
 }
 

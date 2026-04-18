@@ -39,10 +39,8 @@ export default function LoginPage() {
       <div className="w-full max-w-md relative animate-fade-in">
         {/* Logo */}
         <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shadow-2xl shadow-primary-500/30 mb-4">
-            <Zap size={32} className="text-white" />
-          </div>
-          <h1 className="text-2xl font-bold text-slate-900">ZapBill Admin</h1>
+          <img src="/logo.png" alt="FlashBill" className="h-16 object-contain mb-4" />
+          <h1 className="text-2xl font-bold text-slate-900">FlashBill Admin</h1>
           <p className="text-slate-500 text-sm mt-1">Sign in to manage your clients</p>
         </div>
 
@@ -56,7 +54,7 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@zapbill.com"
+                placeholder="admin@flashbill.com"
                 className="w-full px-4 py-3 bg-slate-50/80 border border-slate-300/50 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all text-sm"
               />
             </div>
@@ -102,7 +100,7 @@ export default function LoginPage() {
 
           {/* <div className="mt-6 pt-5 border-t border-slate-300/30">
             <p className="text-xs text-slate-400 text-center">
-              Default: admin@zapbill.com / admin123
+              Default: admin@flashbill.com / admin123
             </p>
           </div> */}
         </div>

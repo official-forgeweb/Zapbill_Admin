@@ -70,7 +70,7 @@ export default function FeaturesPage() {
           <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
             <Puzzle size={22} className="text-primary-400" /> Features
           </h2>
-          <p className="text-slate-500 text-sm mt-0.5">Master list of all ZapBill features</p>
+          <p className="text-slate-500 text-sm mt-0.5">Master list of all FlashBill features</p>
         </div>
         <button onClick={() => { resetForm(); setShowForm(true); }}
           className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-500 text-white rounded-lg text-sm font-semibold hover:from-primary-500 hover:to-primary-400 transition-all shadow-lg shadow-primary-500/20">

@@ -46,14 +46,14 @@ const allowedHeaders = [
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) {
-      // Allow requests with no origin (ZapBill Electron app, server-to-server)
+      // Allow requests with no origin (FlashBill Electron app, server-to-server)
       return callback(null, true);
     }
     
-    // Allow if exact match or if subdomain of zapbill.com
+    // Allow if exact match or if subdomain of flashbill.com
     const isAllowed = allowedOrigins.includes(origin) || 
-                      origin.endsWith('.zapbill.com') ||
-                      origin === 'https://admin.zapbill.com'; 
+                      origin.endsWith('.flashbill.com') ||
+                      origin === 'https://admin.flashbill.com'; 
 
     if (isAllowed) {
       return callback(null, true);
@@ -190,7 +190,7 @@ const PORT = config.port;
 
 if (process.env.NODE_ENV !== 'production' || process.env.VERCEL !== '1') {
   const server = app.listen(PORT, () => {
-    console.log(`🚀 ZapBill Admin Server running on port ${PORT}`);
+    console.log(`🚀 FlashBill Admin Server running on port ${PORT}`);
   });
 
   // Graceful Shutdown

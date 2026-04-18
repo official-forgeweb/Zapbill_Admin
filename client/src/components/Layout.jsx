@@ -48,11 +48,9 @@ export default function Layout() {
       `}>
         {/* Logo */}
         <div className="flex items-center gap-3 px-5 py-5 border-b border-slate-200/50">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center shadow-lg shadow-primary-500/30">
-            <Zap size={20} className="text-white" />
-          </div>
+          <img src="/logo.png" alt="FlashBill" className="w-9 h-9 object-contain" />
           <div>
-            <h1 className="text-base font-bold text-slate-900 tracking-tight">ZapBill</h1>
+            <h1 className="text-base font-bold text-slate-900 tracking-tight">FlashBill</h1>
             <p className="text-[10px] text-slate-500 font-medium uppercase tracking-widest">Admin Panel</p>
           </div>
           <button onClick={() => setSidebarOpen(false)} className="ml-auto lg:hidden text-slate-500 hover:text-slate-900">

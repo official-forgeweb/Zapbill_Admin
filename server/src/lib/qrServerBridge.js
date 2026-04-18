@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 /**
- * QR Server Bridge - Communicates with the local ZapBill POS QR Server
+ * QR Server Bridge - Communicates with the local FlashBill POS QR Server
  * to push admin commands (force logout, AMC updates, suspend, etc.)
  * 
  * The QR Server runs on http://192.168.65.229:3000 and is the gateway
@@ -16,7 +16,7 @@ const qrServerApi = axios.create({
   timeout: QR_SERVER_TIMEOUT,
   headers: {
     'Content-Type': 'application/json',
-    'X-Admin-Source': 'zapbill-admin-panel',
+    'X-Admin-Source': 'flashbill-admin-panel',
   },
 });
 

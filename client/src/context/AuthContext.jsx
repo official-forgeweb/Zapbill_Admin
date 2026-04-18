@@ -8,16 +8,16 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('zapbill_token');
-    const savedAdmin = localStorage.getItem('zapbill_admin');
+    const token = localStorage.getItem('flashbill_token');
+    const savedAdmin = localStorage.getItem('flashbill_admin');
     if (token && savedAdmin) {
       setAdmin(JSON.parse(savedAdmin));
       // Verify token is still valid
       api.get('/auth/me')
         .then(res => setAdmin(res.data.admin))
         .catch(() => {
-          localStorage.removeItem('zapbill_token');
-          localStorage.removeItem('zapbill_admin');
+          localStorage.removeItem('flashbill_token');
+          localStorage.removeItem('flashbill_admin');
           setAdmin(null);
         })
         .finally(() => setLoading(false));
@@ -29,15 +29,15 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     const res = await api.post('/auth/login', { email, password });
     const { token, admin: adminData } = res.data;
-    localStorage.setItem('zapbill_token', token);
-    localStorage.setItem('zapbill_admin', JSON.stringify(adminData));
+    localStorage.setItem('flashbill_token', token);
+    localStorage.setItem('flashbill_admin', JSON.stringify(adminData));
     setAdmin(adminData);
     return adminData;
   };
 
   const logout = () => {
-    localStorage.removeItem('zapbill_token');
-    localStorage.removeItem('zapbill_admin');
+    localStorage.removeItem('flashbill_token');
+    localStorage.removeItem('flashbill_admin');
     setAdmin(null);
   };
 

@@ -29,7 +29,7 @@ const authenticateWebsite = async (req, res, next) => {
   }
 };
 
-// Middleware to authenticate ZapBill POS internal requests
+// Middleware to authenticate FlashBill POS internal requests
 const authenticatePOS = async (req, res, next) => {
   try {
     const licenseKey = req.headers['x-license-key'];
@@ -240,7 +240,7 @@ router.get('/internal/poll', authenticatePOS, async (req, res) => {
 
     res.json({
       orders: pendingOrders.map(o => ({
-        id: o.order_id, // For ZapBill's ID compatibility
+        id: o.order_id, // For FlashBill's ID compatibility
         order_id: o.order_id,
         received_at: o.received_at,
         customer_name: o.order_data.customer?.name,
@@ -285,7 +285,7 @@ router.post('/internal/acknowledge', authenticatePOS, async (req, res) => {
     });
 
     if (action === 'accepted') {
-      // In a real app we might delete it for privacy as prompt suggests after ZapBill pulls it.
+      // In a real app we might delete it for privacy as prompt suggests after FlashBill pulls it.
       // E.g., await prisma.website_pending_orders.delete({where: ...})
       // But we will mark it accepted for status api.
       await prisma.website_pending_orders.update({

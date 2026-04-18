@@ -133,7 +133,7 @@ export default function CreateClientPage() {
         </div>
         <div>
           <h2 className="text-xl font-bold text-slate-900">Create New Client</h2>
-          <p className="text-slate-500 text-sm">Register a new ZapBill POS client</p>
+          <p className="text-slate-500 text-sm">Register a new FlashBill POS client</p>
         </div>
       </div>
 
