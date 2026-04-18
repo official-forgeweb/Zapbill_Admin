@@ -100,11 +100,11 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-6 pt-5 border-t border-slate-300/30">
+          {/* <div className="mt-6 pt-5 border-t border-slate-300/30">
             <p className="text-xs text-slate-400 text-center">
               Default: admin@zapbill.com / admin123
             </p>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
