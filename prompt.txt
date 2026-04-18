@@ -1,3 +1,0 @@
-it is still not making any connection between admin panel as i deleted that client which is the current local software which is running on localhost:5173 and server on [1] 22:22:41.875 > QR Server running at http://192.168.65.229:3000 we have to use this server to build a connection 
-i delete that entry but it still not logout from the local running it is still running it we have to send info of amc also it there is problem coming of it like which is renew amc and in setting you can see that amc valid untill 1/1/2026 which is completely wrong so solve these errors 
-
