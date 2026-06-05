@@ -245,4 +245,91 @@ router.post('/heartbeat', async (req, res) => {
   }
 });
 
+// POST /api/sync/check-coupon-limit - Verify device limit on activation
+router.post('/check-coupon-limit', async (req, res) => {
+  try {
+    const { license_key, hardware_id, device_name, os_info } = req.body;
+
+    if (!license_key || !hardware_id) {
+      return res.status(400).json({ error: 'license_key and hardware_id are required' });
+    }
+
+    // Find the coupon
+    const coupon = await prisma.coupons.findUnique({
+      where: { license_key }
+    });
+
+    if (!coupon) {
+      return res.status(404).json({ error: 'Invalid activation code' });
+    }
+
+    if (coupon.status === 'revoked') {
+      return res.status(403).json({ error: 'This activation code has been revoked' });
+    }
+
+    // Check if this device is already activated for this coupon
+    const existingActivation = await prisma.coupon_activations.findUnique({
+      where: {
+        license_key_hardware_id: {
+          license_key,
+          hardware_id
+        }
+      }
+    });
+
+    if (existingActivation) {
+      // If already activated for this hardware_id, make sure it is marked active
+      if (!existingActivation.is_active) {
+        await prisma.coupon_activations.update({
+          where: { id: existingActivation.id },
+          data: { is_active: true, deactivated_at: null, deactivation_reason: null }
+        });
+      }
+      return res.json({ success: true, message: 'Device reactivated successfully' });
+    }
+
+    // Check device limit
+    const activeCount = await prisma.coupon_activations.count({
+      where: { license_key, is_active: true }
+    });
+
+    if (activeCount >= coupon.max_devices) {
+      return res.status(403).json({ 
+        error: `Device limit reached. This activation code is already activated on the maximum number of devices (${coupon.max_devices}).` 
+      });
+    }
+
+    // Create activation record
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + coupon.validity_days);
+
+    await prisma.coupon_activations.create({
+      data: {
+        coupon_id: coupon.id,
+        license_key,
+        hardware_id,
+        device_name: device_name || null,
+        os_info: os_info || null,
+        activation_date: new Date(),
+        calculated_expiry_date: expiryDate
+      }
+    });
+
+    // Update coupon stats
+    await prisma.coupons.update({
+      where: { id: coupon.id },
+      data: {
+        status: 'activated',
+        activated_at: coupon.activated_at || new Date(),
+        current_device_count: activeCount + 1
+      }
+    });
+
+    res.json({ success: true, message: 'Device activated successfully' });
+  } catch (error) {
+    console.error('Check coupon limit error:', error);
+    res.status(500).json({ error: 'Server validation error' });
+  }
+});
+
 module.exports = router;

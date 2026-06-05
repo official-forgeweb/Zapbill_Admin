@@ -3,7 +3,7 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard, Users, KeyRound, Monitor, Puzzle, CreditCard,
-  ShieldCheck, ScrollText, Menu, X, LogOut, ChevronDown, Zap, Globe, Clock
+  ShieldCheck, ScrollText, Menu, X, LogOut, ChevronDown, Zap, Globe, Clock, Ticket
 } from 'lucide-react';
 
 const navItems = [
@@ -16,6 +16,7 @@ const navItems = [
   { to: '/plans', icon: CreditCard, label: 'Plans' },
   { to: '/amc', icon: ShieldCheck, label: 'AMC Payments' },
   { to: '/website-orders', icon: Globe, label: 'Website Orders' },
+  { to: '/coupons', icon: Ticket, label: 'Coupons' },
   { to: '/audit', icon: ScrollText, label: 'Audit Logs' },
 ];
 

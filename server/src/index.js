@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+// trigger restart 4
 const cors = require('cors');
 const path = require('path');
 const helmet = require('helmet');
@@ -133,11 +134,13 @@ const dashboardRoutes = require('./routes/dashboard');
 const syncRoutes = require('./routes/sync');
 const woAdminRoutes = require('./routes/website-orders-admin');
 const woApiRoutes = require('./routes/website-orders-api');
+const couponRoutes = require('./routes/couponRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/clients', clientRoutes);
 app.use('/api/licenses', licenseRoutes);
 app.use('/api/devices', deviceRoutes);
+app.use('/api/admin/coupons', couponRoutes);
 app.use('/api/features', featureRoutes);
 app.use('/api/plans', planRoutes);
 app.use('/api/amc', amcRoutes);

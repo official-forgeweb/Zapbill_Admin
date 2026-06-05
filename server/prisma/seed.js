@@ -41,6 +41,8 @@ async function main() {
     { feature_key: 'analytics', feature_name: 'Advanced Analytics', description: 'Business intelligence and insights dashboard', is_free: false, monthly_price: 499, yearly_price: 4999 },
     { feature_key: 'whatsapp_integration', feature_name: 'WhatsApp Integration', description: 'Send bills and updates via WhatsApp', is_free: false, monthly_price: 299, yearly_price: 2999 },
     { feature_key: 'expenses', feature_name: 'Expense Management', description: 'Track daily expenses and cash outs', is_free: false, monthly_price: 199, yearly_price: 1999 },
+    { feature_key: 'table_management', feature_name: 'Table & Floor Management', description: 'Design and manage table layouts and floors for dine-in operations', is_free: false, monthly_price: 199, yearly_price: 1999 },
+    { feature_key: 'wastage_management', feature_name: 'Wastage Management', description: 'Track raw material and food wastage', is_free: false, monthly_price: 199, yearly_price: 1999 },
   ];
 
   for (const f of featuresData) {
@@ -70,7 +72,7 @@ async function main() {
       one_time_price: 9999,
       amc_price_per_year: 3999,
       max_devices: 2,
-      features: ['billing', 'menu_management', 'inventory', 'customer_management', 'cloud_sync', 'email_reports'],
+      features: ['billing', 'menu_management', 'inventory', 'table_management', 'wastage_management', 'customer_management', 'cloud_sync', 'email_reports'],
     },
     {
       plan_key: 'one_time_premium',
@@ -79,7 +81,7 @@ async function main() {
       one_time_price: 19999,
       amc_price_per_year: 7999,
       max_devices: 5,
-      features: ['billing', 'menu_management', 'inventory', 'qr_order', 'kitchen_display', 'cloud_sync', 'email_reports', 'customer_management', 'staff_management', 'analytics', 'whatsapp_integration', 'website_orders', 'expenses'],
+      features: ['billing', 'menu_management', 'inventory', 'table_management', 'wastage_management', 'qr_order', 'kitchen_display', 'cloud_sync', 'email_reports', 'customer_management', 'staff_management', 'analytics', 'whatsapp_integration', 'website_orders', 'expenses'],
     },
   ];
 

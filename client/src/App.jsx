@@ -14,6 +14,8 @@ import AmcPage from './pages/AmcPage';
 import AuditPage from './pages/AuditPage';
 import WebsiteOrdersOverviewPage from './pages/WebsiteOrdersOverviewPage';
 import TrialClientsPage from './pages/TrialClientsPage';
+import CouponsListPage from './pages/CouponsListPage';
+import GenerateCouponPage from './pages/GenerateCouponPage';
 
 function ProtectedRoute({ children }) {
   const { admin, loading } = useAuth();
@@ -50,6 +52,8 @@ function AppRoutes() {
         <Route path="audit" element={<AuditPage />} />
         <Route path="website-orders" element={<WebsiteOrdersOverviewPage />} />
         <Route path="trials" element={<TrialClientsPage />} />
+        <Route path="coupons" element={<CouponsListPage />} />
+        <Route path="coupons/new" element={<GenerateCouponPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
